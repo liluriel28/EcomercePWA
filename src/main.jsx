@@ -7,15 +7,15 @@ import router from './route/index'
 import { Provider } from 'react-redux'
 import { store } from './store/store.js'
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register("/service-worker.js")
+      .register('/service-worker.js')
       .then((registration) => {
-        console.log("Service Worker registrado con éxito:", registration.scope);
+        console.log('Service Worker registrado con éxito:', registration);
       })
       .catch((error) => {
-        console.log("Error al registrar el Service Worker:", error);
+        console.error('Error al registrar el Service Worker:', error);
       });
   });
 }

@@ -1,58 +1,28 @@
-const CACHE_NAME = "app-cache-v1";
-const urlsToCache = [
-  "/", // Página principal
-  "/index.html", // HTML principal
-  "/manifest.json", // Manifest
-  "/favicon.ico", // Ícono
-  "/assets/style.css", // Ejemplo de CSS
-  "/assets/logo.png", // Ejemplo de imagen
-];
-
-// Instalación: Cachear los archivos esenciales
-self.addEventListener("install", (event) => {
-  console.log("[Service Worker] Instalando...");
+self.addEventListener('install', (event) => {
+  console.log('Service Worker Instalado');
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("[Service Worker] Archivos cacheados");
-      return cache.addAll(urlsToCache);
+    caches.open('achanta').then((cache) => {
+      return cache.addAll([
+        '/',       
+        '/index.html',   
+        '/styles.css',    
+        '/script.js',   
+        '/images/logo.png' 
+      ]);
     })
   );
 });
 
-// Activación: Eliminar caches antiguos
-self.addEventListener("activate", (event) => {
-  console.log("[Service Worker] Activando...");
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log("[Service Worker] Eliminando cache antiguo:", cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker Activado');
 });
 
-// Interceptar solicitudes: Cache-First (Primero busca en el cache)
-self.addEventListener("fetch", (event) => {
-  console.log("[Service Worker] Interceptando:", event.request.url);
+// También puedes agregar el fetch event si necesitas que el service worker maneje las solicitudes
+self.addEventListener('fetch', (event) => {
+  console.log('Interceptando solicitud para:', event.request.url);
   event.respondWith(
     caches.match(event.request).then((response) => {
-      if (response) {
-        console.log("[Service Worker] Sirviendo desde cache:", event.request.url);
-        return response;
-      }
-      console.log("[Service Worker] Solicitando a la red:", event.request.url);
-      return fetch(event.request).then((networkResponse) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          // Guarda una copia en el cache para solicitudes futuras
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
-        });
-      });
+      return response || fetch(event.request);
     })
   );
 });
